@@ -2,7 +2,6 @@
 var fs = require('fs');
 var babel = require('babel-core');
 var myPlugin = require('./myPlugin');
-var babelPluginJsxSyntax = require('babel-plugin-syntax-jsx');
 
 // read the filename from the command line arguments
 var fileName = process.argv[2];
@@ -16,7 +15,7 @@ fs.readFile(fileName, function(err, data) {
 
   // use our plugin to transform the source
   var out = babel.transform(src, {
-    plugins: [babelPluginJsxSyntax, myPlugin]
+    plugins: [myPlugin]
   });
 
   // print the generated code to screen

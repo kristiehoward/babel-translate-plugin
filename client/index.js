@@ -2,6 +2,7 @@
 import { translate } from 'translations.js';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+// TODO Bring back this app once webpack integration is set up with debugging
 // import App from './components/App';
 
 class App extends Component {
@@ -41,4 +42,6 @@ class App extends Component {
  }
 }
 
-ReactDOM.render(<App someVar="Kristie" />, document.getElementById('app'));
+// TODO Ensure that if we use someVar="Kristie" that it works
+// TODO Ensure that 'app' doesn't get changed into translate('app')
+ReactDOM.render(<App someVar={"Kristie"} />, document.getElementById('app'));
