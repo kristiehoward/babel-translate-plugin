@@ -31,9 +31,14 @@ class App extends Component {
 
  render() {
    const { someVar } = this.props;
+   console.log('Dont try to translate me');
    return (
-     <div>
-       <h1>Hello World</h1>
+     <div
+       {...this.props}
+       anotherProp={'this is a string'}
+       fixedProp="fixedProp"
+      >
+       Hello World
        <h2>It is me</h2>
        <p>{this.sayHi()}</p>
        {this.renderMailTo(someVar)}
@@ -42,6 +47,4 @@ class App extends Component {
  }
 }
 
-// TODO Ensure that if we use someVar="Kristie" that it works
-// TODO Ensure that 'app' doesn't get changed into translate('app')
-ReactDOM.render(<App someVar={"Kristie"} />, document.getElementById('app'));
+ReactDOM.render(<App someVar="Kristie" />, document.getElementById('app'));
