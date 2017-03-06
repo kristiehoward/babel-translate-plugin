@@ -1,4 +1,5 @@
-module.exports = function ({ types: t }) {
+module.exports = function (babel) {
+  const { types: t } = babel;
   const isWhitespaceBetweenJSXElements = (path) => {
     // const currentNodeKey = path.key;
     // // Case 1: Current node is first

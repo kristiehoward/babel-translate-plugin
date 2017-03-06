@@ -1,5 +1,16 @@
 // TODO Automatically need to import translate function (try webpack?)
-import { translate } from 'translations.js';
+// import { translate } from 'translations.js';
+const translate = (word, lang) => {
+  // const translation = `Translating ${word} into ${lang}`;
+  // console.log(translation);
+  console.log(word);
+  console.log(lang);
+  // debugger;
+  // MAKE SURE THIS DOESNT GET TRANSLATED!!
+  debugger;
+  return 1;
+}
+
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 // TODO Bring back this app once webpack integration is set up with debugging
