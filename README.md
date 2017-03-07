@@ -32,3 +32,7 @@ Run `yarn start` and navigate to `localhost:8080`
 - Do NOT translate any function arguments that are string literals
     - ex: `console.log('this is a test')`
     - ex: `document.getElementById('app')`
+
+
+#### Resources
+[Similar plugin](https://github.com/yahoo/babel-plugin-react-intl/blob/master/src/index.js)

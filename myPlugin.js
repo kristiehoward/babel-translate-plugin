@@ -31,6 +31,15 @@ module.exports = function (babel) {
   // - ADJ JSX elements
   // - ADJ JSXExpressions
 
+  // Idea: Only translate code INSIDE Class Declarations - nested visitors
+  // TODO: use `path.get('callee') instead of path.callee`
+  // https://github.com/thejameskyle/babel-handbook/blob/master/translations/en/plugin-handbook.md#get-the-path-of-sub-node
+
+  // Find the specific parent path
+  // https://github.com/thejameskyle/babel-handbook/blob/master/translations/en/plugin-handbook.md#find-a-specific-parent-path
+
+  // TODO Throw babel translation errors
+  // throw path.buildCodeFrameError("Error message here");
   return {
     // Require the JSX syntax
     inherits: require("babel-plugin-syntax-jsx"),
