@@ -29,6 +29,7 @@ Run `yarn start` and navigate to `localhost:8080`
 
 - TODO: Do NOT translate anything outside of a Class Declaration
 - TODO: Add OPT IN translation of functions
+- TODO: Add OPT OUT translation of functions (or string / var)?
 - TODO: Add options for what to call the translate function
 - TODO: Add options for what mode to use - string literals or not
 
