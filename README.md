@@ -27,11 +27,39 @@ Run `yarn start` and navigate to `localhost:8080`
 
 #### When we apply the `translate` function
 
+- TODO: Do NOT translate anything outside of a Class Declaration
+- TODO: Add OPT IN translation of functions
+- TODO: Add options for what to call the translate function
+- TODO: Add options for what mode to use - string literals or not
+
+
 - Do NOT translate any strings passed into components as either string literals or JSXExpressionContainers with string literals
     - ex: `anotherProp={'this is a string'}` or `fixedProp="fixedProp"`
 - Do NOT translate any function arguments that are string literals
     - ex: `console.log('this is a test')`
     - ex: `document.getElementById('app')`
+
+
+#### Opt in
+// All string literals are translated *within the function*
+```
+/* translate-enable */
+const myFunc = () => {
+  return 'hi';
+}
+
+```
+becomes
+```
+const myFunc = () => {
+  return translate('hi');
+}
+
+```
+
+
+
+- TODO: Import translate function and use it yourself
 
 
 #### Resources
