@@ -1,89 +1,81 @@
-module.exports = function (babel) {
-  const { types: t } = babel;
-  const isWhitespaceBetweenJSXElements = (path) => {
-    // const currentNodeKey = path.key;
-    // // Case 1: Current node is first
-    // // Case 2: Current node is somewhere in the middle
-    // // Case 3: Current node is last
-    // if (currentNodeKey !== 0 && currentNodeKey !== path.container.length) {
-    //   // Check if the adjacent siblings are JSXExpressionContainers
-    //   const aboveSibling = path.getSibling(currentNodeKey - 1);
-    //   const belowSibling = path.getSibling(currentNodeKey + 1);
-    //   if (t.isJSXExpressionContainer(aboveSibling)) {
-    //     console.log('Above sibling is a JSX container');
-    //   }
-    //   if (t.isJSXExpressionContainer(belowSibling)) {
-    //     console.log('Below sibling is a JSX container');
-    //   }
-    // }
-    // TODO Find a better way to check the types for this - look at Babel Types
-    // A value that has at least one non whitespace character will match this
-    // regex
-    return !/\S+/.test(path.node.value);
-    // return node.value === '\n       ';
-  };
+const template = require('babel-template');
 
+// includeAst is an AST representing the require call for adding our
+// translation function to each source file we modify.
+const includeAst = template(`var translate = require('babel-translate-plugin').translate;`)();
+
+module.exports = function ({ types: t }) {
   const wrapWithTranslateFn = (args) => {
     return t.callExpression(t.identifier('translate'), args);
   };
 
-  // TODO ignore whitespace between:
-  // - ADJ JSX elements
-  // - ADJ JSXExpressions
+  const JSXChildrenVisitor = {
+    JSXExpressionContainer: {
+      exit(path, state) {
+        state.changed = true;
+        path.node.expression = wrapWithTranslateFn([path.node.expression]);
+      },
+    },
 
-  // Idea: Only translate code INSIDE Class Declarations - nested visitors
-  // TODO: use `path.get('callee') instead of path.callee`
-  // https://github.com/thejameskyle/babel-handbook/blob/master/translations/en/plugin-handbook.md#get-the-path-of-sub-node
+    JSXText(path, state) {
+      const { value } = path.node;
+      if (value.trim() === "") {
+        return;
+      }
 
-  // Find the specific parent path
-  // https://github.com/thejameskyle/babel-handbook/blob/master/translations/en/plugin-handbook.md#find-a-specific-parent-path
+      state.changed = true;
+      // JSXText needs to be extracted and transformed into a
+      // StringLiteral to be passed as an argument
+      path.replaceWith(t.JSXExpressionContainer(
+        wrapWithTranslateFn([t.stringLiteral(value)])
+      ));
+      path.skip();
+    },
+  }
 
-  // TODO Throw babel translation errors
-  // throw path.buildCodeFrameError("Error message here");
   return {
     // Require the JSX syntax
     inherits: require("babel-plugin-syntax-jsx"),
     visitor: {
+      Program: {
+        enter(path, state) {
+          // upon entering each source file reset the state so that we don't
+          // add translate requires when unnecessary
+          state.changed = false;
+        },
+        exit(path, state) {
+          if (state.changed) {
+            path.unshiftContainer('body', includeAst);
+          }
+        },
+      },
+
+      /**
+       * The JSXElement visitor transforms the contents of a JSX element if it
+       * has a  child which is not another JSX element.
+       *
+       * This ensures that all of the content rendered by react is wrapped in a
+       * translate function; nothing else will be wrapped.
+       */
+      JSXElement(path, state) {
+        const { children } = path.node;
+        if (children.length === 0) {
+          return;
+        }
+
+        path.traverse(JSXChildrenVisitor, state);
+        path.skip();
+      },
+
       ImportDeclaration(path) {
         // Skip all import declarations and their children
         path.skip();
       },
+
       JSXAttribute(path) {
         // Skip any JSX attributes
         path.skip();
       },
-      StringLiteral(path) {
-        // If the parent of the string literal is the translate function,
-        // ignore it because we added the string literal in the JSX text visitor
-        const parent = path.parentPath.node;
-        if (t.isCallExpression(parent) && parent.callee.name === 'translate') {
-          console.log('Skipping ', path.node.value);
-          path.skip();
-        } else if (path.listKey === 'arguments') {
-          // Skip string literal arguments to functions
-          console.log('Skipping for LIST KEY ', path.node.value);
-          path.skip();
-        } else {
-          path.replaceWith(
-            wrapWithTranslateFn([t.stringLiteral(path.node.value)])
-          );
-        }
-      },
-      JSXText(path) {
-        if (!isWhitespaceBetweenJSXElements(path)) {
-          // If the parent is a JSXElement, wrap in a JSX Expression container
-          // console.log('JSXText', path.node.value);
-          path.replaceWith(
-            // Call the function 'translate' with arguments of [path.node.value]
-            // Do not parse the same node twice!
-            // TODO Add language as second arg
-            t.JSXExpressionContainer(
-              wrapWithTranslateFn([t.stringLiteral(path.node.value)])
-            )
-
-          );
-        }
-      }
     },
   };
 };
